@@ -104,8 +104,48 @@ int instruction_decode(unsigned op,struct_controls *controls)
 	 controls->MemWrite = 0;
 	 controls->ALUSrc = 0;
 	 controls->RegWrite = 0;
+     if(op == 0){ //r-type insturction
+        controls->RegDst = 1;
+        controls->RegWrite = 1;
+        controls->ALUSrc = 1;
+     }
+     else if(op == 2 || op == 3){ //jump instruction
+        controls->RegDst = 2;
+        controls->MemtoReg = 2;
+        controls->Jump = 1;
+	    controls->ALUSrc = 2;
+        
+     }
+     else if(op == 8 || op == 12){ //addi and andi
+        controls->ALUSrc = 1;
+        controls->RegWrite = 1;
+     }
+     else if(op == 4){//beq
+        controls->Branch = 1;
+        controls->MemtoReg = 2;
+     } 
+     else if(op == 5){ //bne
+        controls->RegDst = 2;
+        controls->MemtoReg = 2;
+        controls->ALUSrc = 1;
+     }
+     else if(op == 35){ //loadword
+        controls->MemRead = 1;
+        controls->MemtoReg = 1;
+        controls->ALUSrc = 1;
+        controls->RegWrite = 1;
+     }
+     else if(op == 43){ //storeword
+        controls->RegDst = 2;
+        controls->MemWrite = 1;
+        controls->MemtoReg = 2;
+        controls->ALUSrc = 1;
+     }
+     return 0;
+
 
      // if else chain based off of value of op to set control signals
+
 }
 
 /* Read Register */
