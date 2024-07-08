@@ -164,12 +164,12 @@ return 1; // invalid
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
-        if(ALUresult % 4 != 0) // check check for halt condition
+        if(ALUresult % 4 != 0) // check check for halt condition ?may need to change to encompass out of bounds
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
     if(MemWrite == 1) {
-        if(ALUresult % 4 != 0) // check for halt condition
+        if(ALUresult % 4 != 0) // check for halt condition  ?may need to change to encompass out of bounds
             return 1;
         Mem[ALUresult >> 2] = data2; // write to memory
     }
@@ -180,7 +180,7 @@ int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsig
 /* 10 Points */
 void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,char RegWrite,char RegDst,char MemtoReg,unsigned *Reg)
 {
-
+   
 }
 
 /* PC update */
