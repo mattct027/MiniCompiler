@@ -107,7 +107,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
      if(op == 0){ //r-type insturction
         controls->RegDst = 1;
         controls->RegWrite = 1;
-        controls->ALUSrc = 1;
+
      }
      else if(op == 2 || op == 3){ //jump instruction
         controls->RegDst = 2;
@@ -214,7 +214,7 @@ return 1; // invalid
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
-        if(ALUresult % 4 != 0) // check check for halt condition ?may need to change to encompass out of bounds
+        if(ALUresult % 4 != 0 || ALUresult == 65536) // check check for halt condition ?may need to change to encompass out of bounds
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
