@@ -97,23 +97,13 @@ int instruction_decode(unsigned op,struct_controls *controls)
 {
      controls->RegDst = 0;
      controls->Jump = 0;
-<<<<<<< HEAD
-	 controls->Branch = 0;
-	 controls->MemRead = 0;
-	 controls->MemtoReg = 0;
-	 controls->ALUOp = 0;
-	 controls->MemWrite = 0;
-	 controls->ALUSrc = 0;
-	 controls->RegWrite = 0;
-=======
      controls->Branch = 0;
      controls->MemRead = 0;
      controls->MemtoReg = 0;
      controls->ALUOp = 0;
      controls->MemWrite = 0;
-     controls->ALUSrc = 0;	 
+     controls->ALUSrc = 0;
      controls->RegWrite = 0;
->>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
 
      if(op == 0){ //r-type insturction
         controls->RegDst = 1;
@@ -121,25 +111,25 @@ int instruction_decode(unsigned op,struct_controls *controls)
         controls->ALUOp = 7;
 
      }
-     else if(op == 2 || op == 3){ //jump instruction
-        controls->RegDst = 2;
-        controls->MemtoReg = 2;
+     else if(op == 2){ //jump instruction
+        controls->RegDst = 2; //
+        controls->MemtoReg = 2; //
         controls->Jump = 1;
-	    controls->ALUSrc = 0;
-        controls->ALUOp = 0;
-        
+        controls->ALUSrc = 0; //
+        controls->ALUOp = 0; //
+
      }
      else if(op == 8 || op == 12){ //addi and andi
         controls->ALUSrc = 1;
         controls->RegWrite = 1;
-        controls->ALUOp = 0;
+        controls->ALUOp = 0; //
         if(op == 12){
             controls->ALUOp = 4;
         }
      }
      else if(op == 4){//beq
         controls->Branch = 1;
-        controls->MemtoReg = 2;
+        controls->MemtoReg = 2; // 
         controls->ALUOp = 1;
      } 
      else if(op == 5){ //bne
@@ -154,21 +144,28 @@ int instruction_decode(unsigned op,struct_controls *controls)
         controls->RegWrite = 1;
      }
      else if(op == 43){ //storeword
-        controls->RegDst = 2;
+        controls->RegDst = 2; // 
         controls->MemWrite = 1;
-        controls->MemtoReg = 2;
+        controls->MemtoReg = 2; //
         controls->ALUSrc = 1;
      }
      else if(op == 10 || op == 11){ //slt, sltu
-        controls->RegDst = 2;
-        controls->MemtoReg = 2;
+        //controls->RegDst = 2; //
+        //controls->MemtoReg = 2; //
         controls->ALUSrc = 1;
         controls->RegWrite = 1;
         controls->ALUOp = 2;
         if(op == 11){
-            controls->ALUOp = 3
+            controls->ALUOp = 3;
         }
      }
+    else if (op == 15){
+        controls->RegWrite = 1;
+        controls->ALUSrc = 1;
+        controls->ALUOp = 6;
+    }
+    else
+         return 1;
      return 0;
 
 
@@ -244,20 +241,12 @@ return 1; // invalid
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
-<<<<<<< HEAD
         if(ALUresult % 4 != 0 || ALUresult > 65536) // check check for halt condition ?may need to change to encompass out of bounds
-=======
-        if(ALUresult % 4 != 0 || ALUresult >= 65536) // check check for halt condition ?may need to change to encompass out of bounds
->>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
     if(MemWrite == 1) {
-<<<<<<< HEAD
         if(ALUresult % 4 != 0 || ALUresult > 65536) // check for halt condition  ?may need to change to encompass out of bounds
-=======
-        if(ALUresult % 4 != 0 || ALUresult >= 65536) // check for halt condition  ?may need to change to encompass out of bounds
->>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
             return 1;
         Mem[ALUresult >> 2] = data2; // write to memory
     }
