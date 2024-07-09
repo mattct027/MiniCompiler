@@ -45,7 +45,7 @@ void ALU(unsigned A, unsigned B, char ALUControl, unsigned *ALUresult, char *Zer
     else if (ALUControl == 7) { 
         *ALUresult = ~A;
     }
-    
+
     // set the zero flag based on alu result
     *Zero = (*ALUresult == 0) ? 1 : 0;
 }
@@ -72,20 +72,20 @@ void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsi
     *op = (instruction & 0xfc000000) >> 26; // 31-26
         //bits 31-26 set to 1 for masking 
 
-	*r1 = (instruction & 0x03e00000) >> 21; // 25-21
+    *r1 = (instruction & 0x03e00000) >> 21; // 25-21
         //bits 25-21 set to 1 for masking
 
-	*r2 = (instruction & 0x1f0000) >> 16; // 20-16
+    *r2 = (instruction & 0x1f0000) >> 16; // 20-16
         //bits 20-16 set to 1 for masking
 
-	*r3 = (instruction & 0xf800) >> 11; // 15-11
+    *r3 = (instruction & 0xf800) >> 11; // 15-11
         //bits 15-11 set to 1 for masking
 
-	*funct = instruction & 0x3f; // 5-0
+    *funct = instruction & 0x3f; // 5-0
         //bits 5-0 set to 1 for masking
-	*offset = instruction & 0xffff;	 // 15-0
+    *offset = instruction & 0xffff;	 // 15-0
         //bits 15-0 set to 1 for masking
-	*jsec = instruction & 0x3ffffff; // 25-0
+    *jsec = instruction & 0x3ffffff; // 25-0
         //bits 25-0 set to 1 for masking
 }
 
@@ -97,6 +97,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
 {
      controls->RegDst = 0;
      controls->Jump = 0;
+<<<<<<< HEAD
 	 controls->Branch = 0;
 	 controls->MemRead = 0;
 	 controls->MemtoReg = 0;
@@ -104,6 +105,15 @@ int instruction_decode(unsigned op,struct_controls *controls)
 	 controls->MemWrite = 0;
 	 controls->ALUSrc = 0;
 	 controls->RegWrite = 0;
+=======
+     controls->Branch = 0;
+     controls->MemRead = 0;
+     controls->MemtoReg = 0;
+     controls->ALUOp = 0;
+     controls->MemWrite = 0;
+     controls->ALUSrc = 0;	 
+     controls->RegWrite = 0;
+>>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
 
      if(op == 0){ //r-type insturction
         controls->RegDst = 1;
@@ -182,7 +192,7 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 
         if((offset >> 15) == 1) // could also use offset & 0x8000
             *extended_value = offset | 0xffff0000; //upper 16 bits
-    
+
         else
             *extended_value = offset & 0x0000ffff; // lower 16 bits
 }
@@ -234,15 +244,24 @@ return 1; // invalid
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
+<<<<<<< HEAD
         if(ALUresult % 4 != 0 || ALUresult > 65536) // check check for halt condition ?may need to change to encompass out of bounds
+=======
+        if(ALUresult % 4 != 0 || ALUresult >= 65536) // check check for halt condition ?may need to change to encompass out of bounds
+>>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
     if(MemWrite == 1) {
+<<<<<<< HEAD
         if(ALUresult % 4 != 0 || ALUresult > 65536) // check for halt condition  ?may need to change to encompass out of bounds
+=======
+        if(ALUresult % 4 != 0 || ALUresult >= 65536) // check for halt condition  ?may need to change to encompass out of bounds
+>>>>>>> 653b8390ab7efb73409a79d134c5a75284efe9be
             return 1;
         Mem[ALUresult >> 2] = data2; // write to memory
     }
+    return 0;
 }
 
 
