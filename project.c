@@ -102,26 +102,37 @@ int instruction_decode(unsigned op,struct_controls *controls)
 	 controls->MemtoReg = 0;
 	 controls->ALUOp = 0;
 	 controls->MemWrite = 0;
-	 controls->ALUSrc = 0;	 
-     controls->RegWrite = 0;
-    
+	 controls->ALUSrc = 0;
+	 controls->RegWrite = 0;
+
      if(op == 0){ //r-type insturction
         controls->RegDst = 1;
         controls->RegWrite = 1;
         controls->ALUOp = 7;
+
      }
      else if(op == 2 || op == 3){ //jump instruction
-        controls->Jump = 1; 
+        controls->RegDst = 2;
+        controls->MemtoReg = 2;
+        controls->Jump = 1;
+	    controls->ALUSrc = 0;
+        controls->ALUOp = 0;
+        
      }
      else if(op == 8 || op == 12){ //addi and andi
         controls->ALUSrc = 1;
         controls->RegWrite = 1;
+        controls->ALUOp = 0;
+        if(op == 12){
+            controls->ALUOp = 4;
+        }
      }
      else if(op == 4){//beq
         controls->Branch = 1;
+        controls->MemtoReg = 2;
         controls->ALUOp = 1;
      } 
-     else if(op == 5){ //bne ?is this needed
+     else if(op == 5){ //bne
         controls->RegDst = 2;
         controls->MemtoReg = 2;
         controls->ALUSrc = 1;
@@ -133,13 +144,26 @@ int instruction_decode(unsigned op,struct_controls *controls)
         controls->RegWrite = 1;
      }
      else if(op == 43){ //storeword
+        controls->RegDst = 2;
         controls->MemWrite = 1;
+        controls->MemtoReg = 2;
         controls->ALUSrc = 1;
      }
-     else
-        return 1; // invalid instruction
+     else if(op == 10 || op == 11){ //slt, sltu
+        controls->RegDst = 2;
+        controls->MemtoReg = 2;
+        controls->ALUSrc = 1;
+        controls->RegWrite = 1;
+        controls->ALUOp = 2;
+        if(op == 11){
+            controls->ALUOp = 3
+        }
+     }
      return 0;
+
+
      // if else chain based off of value of op to set control signals
+
 }
 
 /* Read Register */
@@ -165,6 +189,7 @@ void sign_extend(unsigned offset,unsigned *extended_value)
 
 /* ALU operations */
 /* 10 Points */
+
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
     char ALUControl = 0;
@@ -203,17 +228,18 @@ return 1; // invalid
 
 }
 
+
 /* Read / Write Memory */
 /* 10 Points */
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
-        if(ALUresult % 4 != 0 && ALUresult >= 65536) // check check for halt condition ?may need to change to encompass out of bounds
+        if(ALUresult % 4 != 0 || ALUresult > 65536) // check check for halt condition ?may need to change to encompass out of bounds
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
     if(MemWrite == 1) {
-        if(ALUresult % 4 != 0 && ALUresult >= 65536) // check for halt condition  ?may need to change to encompass out of bounds
+        if(ALUresult % 4 != 0 || ALUresult > 65536) // check for halt condition  ?may need to change to encompass out of bounds
             return 1;
         Mem[ALUresult >> 2] = data2; // write to memory
     }
@@ -241,6 +267,7 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 
 /* PC update */
 /* 10 Points */
+
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
     *PC += 4; // increment PC by 4
@@ -254,4 +281,3 @@ void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char 
     }
 }
 
- 
