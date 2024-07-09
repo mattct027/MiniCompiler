@@ -56,7 +56,7 @@ void ALU(unsigned A, unsigned B, char ALUControl, unsigned *ALUresult, char *Zer
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
     //halt condition check, needs to be a multiple of 4
-    if (PC % 4 != 0) 
+    if (PC % 4 != 0 || PC > 65536) 
         return 1;
 
     //instruction fetch
@@ -112,11 +112,11 @@ int instruction_decode(unsigned op,struct_controls *controls)
 
      }
      else if(op == 2){ //jump instruction
-        controls->RegDst = 2; //
-        controls->MemtoReg = 2; //
+       // controls->RegDst = 2; //
+        //controls->MemtoReg = 2; //
         controls->Jump = 1;
-        controls->ALUSrc = 0; //
-        controls->ALUOp = 0; //
+        //controls->ALUSrc = 0; //
+        //controls->ALUOp = 0; //
 
      }
      else if(op == 8 || op == 12){ //addi and andi
@@ -128,6 +128,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
         }
      }
      else if(op == 4){//beq
+        controls->RegDst = 2;
         controls->Branch = 1;
         controls->MemtoReg = 2; // 
         controls->ALUOp = 1;
@@ -159,7 +160,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
             controls->ALUOp = 3;
         }
      }
-    else if (op == 15){
+    else if (op == 15){ // lui
         controls->RegWrite = 1;
         controls->ALUSrc = 1;
         controls->ALUOp = 6;
@@ -201,6 +202,10 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
 {
     char ALUControl = 0;
 
+    if (ALUSrc == 1) { // fixed 2c -> 30 now 2c -> 24
+        data2 = extended_value;
+    }
+
 if (ALUOp == 7) {
     if (funct == 0) { // shift left
         ALUControl = 6;
@@ -226,8 +231,8 @@ if (ALUOp == 7) {
     return 0;
 } 
     //Seperate type of instruction for R-type
-    else if (ALUOp >= 0 && ALUOp < 7) {
-        ALU(data1, extended_value, ALUOp, ALUresult, Zero);
+    else  {
+        ALU(data1, data2, ALUOp, ALUresult, Zero);
         return 0;
 }
 
@@ -285,7 +290,7 @@ void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char 
     }
 
     if(Jump == 1){
-        *PC = (*PC & 0xf0000000) | (jsec << 2); // jump
+        *PC =(jsec << 2) | (*PC & 0xf0000000); // jump
     }
 }
 
