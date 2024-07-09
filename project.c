@@ -18,12 +18,12 @@ void ALU(unsigned A, unsigned B, char ALUControl, unsigned *ALUresult, char *Zer
 
     //slt case
     else if (ALUControl == 2) { 
-        *ALUresult = ((int) A < (int) B) ? 1 : 0;
+        *ALUresult = (int)A < (int)B ? 1 : 0;;
     }
 
     //sltu case
     else if (ALUControl == 3) { 
-        *ALUresult = (A < B) ? 1 : 0;
+        *ALUresult = (unsigned)A < (unsigned)B ? 1 : 0;
     }
 
     //and case
@@ -102,19 +102,16 @@ int instruction_decode(unsigned op,struct_controls *controls)
 	 controls->MemtoReg = 0;
 	 controls->ALUOp = 0;
 	 controls->MemWrite = 0;
-	 controls->ALUSrc = 0;
-	 controls->RegWrite = 0;
+	 controls->ALUSrc = 0;	 
+     controls->RegWrite = 0;
+    
      if(op == 0){ //r-type insturction
         controls->RegDst = 1;
         controls->RegWrite = 1;
-
+        controls->ALUOp = 7;
      }
      else if(op == 2 || op == 3){ //jump instruction
-        controls->RegDst = 2;
-        controls->MemtoReg = 2;
-        controls->Jump = 1;
-	    controls->ALUSrc = 2;
-        
+        controls->Jump = 1; 
      }
      else if(op == 8 || op == 12){ //addi and andi
         controls->ALUSrc = 1;
@@ -122,9 +119,9 @@ int instruction_decode(unsigned op,struct_controls *controls)
      }
      else if(op == 4){//beq
         controls->Branch = 1;
-        controls->MemtoReg = 2;
+        controls->ALUOp = 1;
      } 
-     else if(op == 5){ //bne
+     else if(op == 5){ //bne ?is this needed
         controls->RegDst = 2;
         controls->MemtoReg = 2;
         controls->ALUSrc = 1;
@@ -136,16 +133,13 @@ int instruction_decode(unsigned op,struct_controls *controls)
         controls->RegWrite = 1;
      }
      else if(op == 43){ //storeword
-        controls->RegDst = 2;
         controls->MemWrite = 1;
-        controls->MemtoReg = 2;
         controls->ALUSrc = 1;
      }
+     else
+        return 1; // invalid instruction
      return 0;
-
-
      // if else chain based off of value of op to set control signals
-
 }
 
 /* Read Register */
@@ -214,12 +208,12 @@ return 1; // invalid
 int rw_memory(unsigned ALUresult,unsigned data2,char MemWrite,char MemRead,unsigned *memdata,unsigned *Mem)
 {
     if(MemRead == 1) {
-        if(ALUresult % 4 != 0 || ALUresult == 65536) // check check for halt condition ?may need to change to encompass out of bounds
+        if(ALUresult % 4 != 0 && ALUresult >= 65536) // check check for halt condition ?may need to change to encompass out of bounds
             return 1;
         *memdata = Mem[ALUresult >> 2]; // read from memory
     }
     if(MemWrite == 1) {
-        if(ALUresult % 4 != 0) // check for halt condition  ?may need to change to encompass out of bounds
+        if(ALUresult % 4 != 0 && ALUresult >= 65536) // check for halt condition  ?may need to change to encompass out of bounds
             return 1;
         Mem[ALUresult >> 2] = data2; // write to memory
     }
