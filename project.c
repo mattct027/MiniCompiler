@@ -55,7 +55,7 @@ void ALU(unsigned A, unsigned B, char ALUControl, unsigned *ALUresult, char *Zer
 /* 10 Points */
 int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 {
-    //halt condition check, needs to be a multiple of 4
+    //halt condition check, needs to be a multiple of 4 and in bounds
     if (PC % 4 != 0 || PC > 65536) 
         return 1;
 
@@ -112,17 +112,15 @@ int instruction_decode(unsigned op,struct_controls *controls)
 
      }
      else if(op == 2){ //jump instruction
-       // controls->RegDst = 2; //
-        //controls->MemtoReg = 2; //
+   
         controls->Jump = 1;
-        //controls->ALUSrc = 0; //
-        //controls->ALUOp = 0; //
+        
 
      }
      else if(op == 8 || op == 12){ //addi and andi
         controls->ALUSrc = 1;
         controls->RegWrite = 1;
-        controls->ALUOp = 0; //
+        controls->ALUOp = 0;
         if(op == 12){
             controls->ALUOp = 4;
         }
@@ -130,7 +128,7 @@ int instruction_decode(unsigned op,struct_controls *controls)
      else if(op == 4){//beq
         controls->RegDst = 2;
         controls->Branch = 1;
-        controls->MemtoReg = 2; // 
+        controls->MemtoReg = 2;
         controls->ALUOp = 1;
      } 
      else if(op == 5){ //bne
@@ -145,14 +143,13 @@ int instruction_decode(unsigned op,struct_controls *controls)
         controls->RegWrite = 1;
      }
      else if(op == 43){ //storeword
-        controls->RegDst = 2; // 
+        controls->RegDst = 2; 
         controls->MemWrite = 1;
-        controls->MemtoReg = 2; //
+        controls->MemtoReg = 2; 
         controls->ALUSrc = 1;
      }
      else if(op == 10 || op == 11){ //slt, sltu
-        //controls->RegDst = 2; //
-        //controls->MemtoReg = 2; //
+        
         controls->ALUSrc = 1;
         controls->RegWrite = 1;
         controls->ALUOp = 2;
