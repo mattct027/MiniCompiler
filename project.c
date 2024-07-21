@@ -1,5 +1,6 @@
 #include "spimcore.h"
 
+//Group Members: Bentley Aing Matthew Thomas
 
 /* ALU */
 /* 10 Points */
